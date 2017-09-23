@@ -13,7 +13,6 @@ import java.util.List;
 
 
 public class Main {
-    static boolean fileExist = false;
     static int numberOfMice = 0;
     static int average = 0;
     static int sum = 0;
@@ -23,9 +22,11 @@ public class Main {
     static String bestMouse = "";
 
     public static void parse_category(String url) throws IOException {
+        // creating a folder for our csv data
         File file = new File("Data");
         file.mkdir();
 
+        // getting links to all pages of the chosen (in url) category
         Document doc = Jsoup.connect(url).get();
         Elements links = doc.getElementsByClass("paginator-catalog-l-link");
 
@@ -39,7 +40,6 @@ public class Main {
 
         for (int i = 0; i < num; i++) {
             String page = url + String.format("page=%d", i + 1);
-//            System.out.println("parse_category_page " + i);
             parse_category_page(page);
         }
 
@@ -47,26 +47,16 @@ public class Main {
     }
 
     public static void parse_category_page(String url) throws IOException {
-
         Document doc = Jsoup.connect(url).get();
-
         Elements tiles = doc.getElementsByClass("g-i-tile-i-title");
-//        System.out.println("inside parse_category_page");
         for (Element tile : tiles) {
             Element link = tile.getElementsByTag("a").first();
             numberOfMice += 1;
-//            System.out.println("parse_reviews" + tile);
-            //boolean fileExists = new File("Data/" + (link.attr("href") + "comments/").split("/")[4] + ".csv").exists();
-
             parse_reviews(link.attr("href") + "comments/");
-
         }
-
-
     }
 
     private static void parse_reviews(String url) throws IOException {
-
         int num = 0;
         String pg = "";
         Document doc = Jsoup.connect(url).get();
@@ -99,7 +89,6 @@ public class Main {
             StringBuilder stringBuilder = new StringBuilder();
 
             for (ArrayList<ArrayList<String>> str : sentiments) {
-//            System.out.println("appending");
                 String strForAppend = "";
                 for (int i = 0; i < str.size(); i++) {
                     strForAppend += str.get(i).get(0) + "," + str.get(i).get(1) + "\n";
@@ -146,7 +135,6 @@ public class Main {
         Elements reviews = doc.select("article.pp-review-i");
         ArrayList<ArrayList<String>> sentiments = new ArrayList<ArrayList<String>>();
         Elements texts;
-//        System.out.println("inside parse_reviews_page");
 
         for (Element review : reviews) {
             Elements star = review.select("span.g-rating-stars-i");
@@ -160,8 +148,6 @@ public class Main {
                 sentiments.add(content);
             }
         }
-//        System.out.println("\nreturning sentiments");
-
         return sentiments;
     }
 
